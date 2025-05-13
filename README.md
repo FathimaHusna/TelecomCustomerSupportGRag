@@ -60,8 +60,8 @@ telecom_support_chatbot/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/telecom_support_chatbot.git
-cd telecom_support_chatbot
+git clone https://github.com/FathimaHusna/TelecomCustomerSupportGRag.git
+cd TelecomCustomerSupportGRag
 ```
 
 2. Create a virtual environment and install dependencies:
