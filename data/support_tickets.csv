@@ -1,0 +1,21 @@
+ticket_id,customer_id,issue_type,description,resolution,timestamp,location,device_type,network_type,status
+T1001,C5432,dropped_calls,"Calls keep dropping in the afternoon around 3-4 PM","Reset router and updated firmware",2023-01-15 14:30:00,New York,iPhone 13,4G,resolved
+T1002,C6721,slow_internet,"Internet speed very slow during peak hours","Upgraded bandwidth allocation for the area",2023-01-16 18:45:00,Chicago,Samsung S21,5G,resolved
+T1003,C8901,billing_issue,"Charged for services not subscribed to","Refunded incorrect charges and fixed subscription",2023-01-17 09:15:00,Los Angeles,N/A,N/A,resolved
+T1004,C2345,network_outage,"No service in downtown area","Network tower maintenance completed",2023-01-18 11:30:00,Boston,Google Pixel 6,4G,resolved
+T1005,C7890,dropped_calls,"Calls dropping when moving between areas","Updated cell tower handoff settings",2023-01-19 16:20:00,Seattle,iPhone 12,5G,resolved
+T1006,C3456,data_limit,"Reached data limit too quickly","Identified background app consuming data, provided guidance",2023-01-20 13:10:00,Miami,OnePlus 9,4G,resolved
+T1007,C9012,signal_strength,"Weak signal at home","Provided signal booster device",2023-01-21 10:45:00,Denver,Samsung S22,5G,resolved
+T1008,C5678,dropped_calls,"Calls dropping every 5 minutes","Identified faulty SIM card and replaced",2023-01-22 15:30:00,Atlanta,iPhone 13 Pro,4G,resolved
+T1009,C1234,slow_internet,"Internet unusable during evening hours","Identified local network congestion, rerouted traffic",2023-01-23 20:15:00,Phoenix,iPad Pro,WiFi,resolved
+T1010,C7654,voicemail_issue,"Voicemail not working properly","Reset voicemail settings and cleared cache",2023-01-24 12:40:00,Philadelphia,Samsung Note 20,5G,resolved
+T1011,C8765,dropped_calls,"Calls dropping in basement","Recommended WiFi calling feature activation",2023-01-25 14:50:00,San Francisco,iPhone SE,4G,resolved
+T1012,C2109,billing_issue,"Autopay not working","Updated payment method information",2023-01-26 09:30:00,Houston,N/A,N/A,resolved
+T1013,C5432,network_outage,"No service in residential area","Fixed damaged fiber optic cable",2023-01-27 17:20:00,New York,Google Pixel 7,5G,resolved
+T1014,C6721,slow_internet,"Streaming videos buffer constantly","Optimized router settings and channel",2023-01-28 19:10:00,Chicago,Samsung TV,WiFi,resolved
+T1015,C8901,dropped_calls,"Calls drop when entering elevator","Explained physical limitations, suggested WiFi calling",2023-01-29 13:25:00,Los Angeles,iPhone 13 Mini,4G,resolved
+T1016,C2345,data_limit,"Family plan reaching limit too fast","Identified unauthorized hotspot usage, set limits",2023-01-30 11:05:00,Boston,Various,Various,resolved
+T1017,C7890,signal_strength,"Poor reception in new office","Conducted site survey, installed microcell",2023-01-31 15:40:00,Seattle,Various,4G/5G,resolved
+T1018,C3456,dropped_calls,"Calls dropping during commute on highway","Updated coverage map, identified dead zones",2023-02-01 08:30:00,Miami,Samsung S21,5G,resolved
+T1019,C9012,slow_internet,"Internet slows down when multiple devices connected","Upgraded router to dual-band model",2023-02-02 16:15:00,Denver,Various,WiFi,resolved
+T1020,C5678,network_outage,"Complete service outage in neighborhood","Repaired damaged network equipment after storm",2023-02-03 07:50:00,Atlanta,Various,Various,resolved

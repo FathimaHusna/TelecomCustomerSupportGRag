@@ -1,0 +1,36 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="telecom_support_chatbot",
+    version="0.1.0",
+    packages=find_packages(),
+    install_requires=[
+        "langchain>=0.0.267",
+        "networkx>=3.1",
+        "pandas>=2.0.3",
+        "numpy>=1.24.3",
+        "scikit-learn>=1.3.0",
+        "sentence-transformers>=2.2.2",
+        "faiss-cpu>=1.7.4",
+        "neo4j>=5.9.0",
+        "python-dotenv>=1.0.0",
+        "streamlit>=1.25.0",
+        "matplotlib>=3.7.2",
+        "requests>=2.28.0",
+    ],
+    author="Telecom Support Team",
+    author_email="support@example.com",
+    description="A GraphRAG-based customer support chatbot for telecom companies",
+    keywords="chatbot, telecom, support, graphrag, nlp",
+    url="https://github.com/yourusername/telecom_support_chatbot",
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Customer Service",
+        "Topic :: Software Development :: AI",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+    ],
+    python_requires=">=3.8",
+)

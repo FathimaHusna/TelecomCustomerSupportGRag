@@ -1,0 +1,11 @@
+escalation_id,ticket_id,escalation_level,assigned_team,root_cause,resolution_steps,resolution_time_hours,customer_satisfaction
+E001,T1001,1,Technical Support,"Signal interference from nearby construction site","1. Identified construction site causing interference\n2. Adjusted tower signal direction\n3. Recommended WiFi calling until construction complete",4,8
+E002,T1004,2,Network Operations,"Damaged equipment at network tower","1. Dispatched field technician\n2. Replaced damaged components\n3. Verified service restoration\n4. Updated maintenance schedule",12,7
+E003,T1005,1,Technical Support,"Outdated handoff protocol in specific region","1. Applied software patch to affected towers\n2. Monitored call quality for 24 hours\n3. Confirmed resolution with customer",6,9
+E004,T1009,2,Network Operations,"Bandwidth throttling incorrectly applied to account","1. Identified incorrect account flag\n2. Removed throttling limitation\n3. Applied service credit\n4. Verified speeds with customer",3,10
+E005,T1013,3,Infrastructure Team,"Fiber optic cable cut during municipal work","1. Coordinated with city services\n2. Dispatched emergency repair team\n3. Spliced replacement fiber\n4. Rerouted traffic during repair",24,6
+E006,T1017,2,Field Services,"Office located in signal shadow area","1. Conducted on-site signal analysis\n2. Installed dedicated microcell\n3. Configured network to prioritize business location\n4. Verified coverage throughout office",48,9
+E007,T1018,1,Technical Support,"Handoff failure between towers on highway route","1. Mapped specific dead zones\n2. Adjusted tower parameters\n3. Updated coverage maps\n4. Provided customer with alternative routes",8,7
+E008,T1020,3,Emergency Response,"Storm damage to multiple network components","1. Assessed damage after storm clearance\n2. Prioritized critical infrastructure\n3. Deployed temporary equipment\n4. Scheduled permanent repairs",36,8
+E009,T1002,2,Network Operations,"Insufficient bandwidth allocation for growing area","1. Analyzed usage patterns\n2. Increased capacity allocation\n3. Scheduled infrastructure upgrade\n4. Monitored performance post-change",12,9
+E010,T1007,1,Technical Support,"Building materials blocking signal","1. Identified signal penetration issues\n2. Provided signal booster\n3. Configured optimal placement\n4. Verified improved coverage",5,10
