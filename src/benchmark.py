@@ -138,7 +138,7 @@ class ChatbotBenchmark:
         relevance_score = self.evaluator.evaluate_response_relevance(query, response)
         
         # Prepare context for context utilization evaluation
-        context = self.chatbot._prepare_context(graph_results)
+        context = self.chatbot.prepare_context(graph_results)
         context_score = self.evaluator.evaluate_context_utilization(context, response)
         
         # Evaluate path validity

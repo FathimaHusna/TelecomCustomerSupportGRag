@@ -17,7 +17,15 @@ class DataProcessor:
         self.support_tickets = None
         self.technical_manuals = None
         self.escalation_records = None
-        self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        # Configure embedding device (default to CPU to avoid CUDA issues)
+        self.embedding_device = os.getenv('EMBEDDING_DEVICE', 'cpu').lower()
+        try:
+            self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2', device=self.embedding_device)
+        except Exception as e:
+            print(f"Error initializing embedding model on device '{self.embedding_device}': {e}")
+            print("Falling back to CPU for embeddings.")
+            self.embedding_device = 'cpu'
+            self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
         self.document_embeddings = None
         self.document_texts = []
         self.document_metadata = []
@@ -84,7 +92,26 @@ class DataProcessor:
     def create_embeddings(self):
         """Create embeddings for all preprocessed documents"""
         print("Creating embeddings for all documents...")
-        self.document_embeddings = self.embedding_model.encode(self.document_texts)
+        try:
+            self.document_embeddings = self.embedding_model.encode(
+                self.document_texts,
+                convert_to_numpy=True,
+                show_progress_bar=False
+            )
+        except Exception as e:
+            # Safety fallback in case of CUDA/driver issues during encode
+            if self.embedding_device != 'cpu':
+                print(f"Error during embedding on device '{self.embedding_device}': {e}")
+                print("Retrying on CPU...")
+                self.embedding_device = 'cpu'
+                self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
+                self.document_embeddings = self.embedding_model.encode(
+                    self.document_texts,
+                    convert_to_numpy=True,
+                    show_progress_bar=False
+                )
+            else:
+                raise
         
         # Create FAISS index for fast similarity search
         dimension = self.document_embeddings.shape[1]
@@ -136,28 +163,37 @@ class DataProcessor:
             'locations': []
         }
         
-        # Simple rule-based entity extraction
-        # In a production system, this would be more sophisticated
+        # Simple rule-based entity extraction with canonical issue mapping
+        # In a production system, this would be replaced with an NER model
+        t = text.lower()
         
-        # Extract issue types
-        issue_patterns = [
-            'dropped call', 'slow internet', 'billing issue', 'network outage',
-            'signal strength', 'data limit', 'voicemail', 'no service'
-        ]
-        for pattern in issue_patterns:
-            if re.search(pattern, text.lower()):
-                entities['issue_types'].append(pattern)
+        # Canonical issue types and their keyword heuristics
+        issue_synonyms = {
+            'dropped_calls': [r'dropped\s*call', r'call\s*drop', r'calls?\s*keep\s*dropp', r'handoff', r'while\s*driving'],
+            'slow_internet': [r'slow\s*internet', r'slow\s*speed', r'peak\s*hours', r'unusable\s*during\s*evening', r'bandwidth'],
+            'billing_issue': [r'billing', r'charged', r'charge', r'subscription', r'subscribe', r'refund', r'invoice', r'payment', r'autopay'],
+            'network_outage': [r'no\s*service', r'outage', r'downtime', r'tower', r'downtown\s*area'],
+            'signal_strength': [r'signal\s*strength', r'weak\s*signal', r'no\s*reception', r'coverage', r'basement'],
+            'data_limit': [r'data\s*limit', r'data\s*cap', r'ran\s*out\s*of\s*data', r'data\s*usage', r'background\s*data'],
+            'voicemail': [r'voicemail', r'voice\s*mail']
+        }
+        for canonical, patterns in issue_synonyms.items():
+            for pat in patterns:
+                if re.search(pat, t):
+                    if canonical not in entities['issue_types']:
+                        entities['issue_types'].append(canonical)
+                    break
         
         # Extract devices
         device_patterns = ['iphone', 'samsung', 'pixel', 'router', 'modem', 'android']
         for pattern in device_patterns:
-            if re.search(pattern, text.lower()):
+            if re.search(pattern, t):
                 entities['devices'].append(pattern)
         
         # Extract network types
         network_patterns = ['4g', '5g', 'wifi', 'lte', 'cellular']
         for pattern in network_patterns:
-            if re.search(pattern, text.lower()):
+            if re.search(pattern, t):
                 entities['network_types'].append(pattern)
         
         return entities

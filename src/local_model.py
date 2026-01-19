@@ -21,6 +21,7 @@ class LocalModelHandler:
         self.ollama_base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         self.is_ollama_available = self._check_ollama_available()
         self.timeout = 60  # Timeout in seconds for API calls
+        self.force_cpu = os.getenv("OLLAMA_FORCE_CPU", "false").lower() == "true"
         
     def _check_ollama_available(self):
         """Check if Ollama is available on the system"""
@@ -40,7 +41,11 @@ class LocalModelHandler:
             response = requests.get(f"{self.ollama_base_url}/api/tags", timeout=5)
             if response.status_code == 200:
                 models = response.json().get("models", [])
-                return any(model.get("name") == self.model_name for model in models)
+                target = self.model_name
+                return any(
+                    (m.get("name") == target) or (m.get("name", "").split(":")[0] == target)
+                    for m in models
+                )
             return False
         except Exception as e:
             print(f"Error checking model availability: {e}")
@@ -78,30 +83,55 @@ class LocalModelHandler:
             if not self.pull_model():
                 return f"Model {self.model_name} is not available. Please run 'ollama pull {self.model_name}' first."
         
-        try:
-            # Call Ollama API with timeout
+        def _call_ollama(options_override=None):
+            payload = {
+                "model": self.model_name,
+                "prompt": prompt,
+                "stream": False,
+                "options": {
+                    "temperature": 0.2,
+                    "top_p": 0.9,
+                    "max_tokens": 220
+                }
+            }
+            # Global CPU-only hint if set
+            if self.force_cpu:
+                payload["options"]["num_gpu"] = 0
+            if options_override:
+                payload["options"].update(options_override)
+
             start_time = time.time()
-            response = requests.post(
+            resp = requests.post(
                 f"{self.ollama_base_url}/api/generate",
-                json={
-                    "model": self.model_name,
-                    "prompt": prompt,
-                    "stream": False,
-                    "options": {
-                        "temperature": 0.7,
-                        "top_p": 0.9,
-                        "max_tokens": 800
-                    }
-                },
+                json=payload,
                 timeout=self.timeout
             )
             end_time = time.time()
             print(f"Ollama response time: {end_time - start_time:.2f} seconds")
-            
+            return resp
+
+        try:
+            # First attempt (default settings)
+            response = _call_ollama()
+            # If server returns CUDA error, retry with CPU-only hint
+            if response.status_code != 200:
+                body = response.text or ""
+                if "CUDA error" in body or "cuda" in body.lower():
+                    print("CUDA error detected from Ollama. Retrying with CPU-only options (num_gpu=0)...")
+                    response = _call_ollama({"num_gpu": 0})
+
             if response.status_code == 200:
                 return response.json().get("response", "No response generated")
             else:
-                return f"Error generating response: {response.text}"
+                # Return helpful guidance if CUDA issues persist
+                body = response.text
+                if "CUDA" in body or "cuda" in body.lower():
+                    return (
+                        "Ollama reported a CUDA error. Try CPU fallback: "
+                        "restart Ollama with GPU disabled (e.g., set CUDA_VISIBLE_DEVICES='' and run 'ollama serve'), "
+                        "or ensure GPU drivers match your CUDA toolchain."
+                    )
+                return f"Error generating response: {body}"
         except requests.exceptions.Timeout:
             return "Request to Ollama timed out. The model might be too slow or the server is overloaded."
         except Exception as e:

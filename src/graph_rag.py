@@ -18,6 +18,13 @@ class GraphRAG:
         self.issue_to_cause_map = {}
         self.cause_to_resolution_map = {}
         
+    @staticmethod
+    def _normalize(text):
+        try:
+            return str(text).lower().replace('_', ' ').strip()
+        except Exception:
+            return str(text).lower()
+        
     def build_knowledge_graph(self):
         """Build the knowledge graph from the processed data"""
         print("Building knowledge graph...")
@@ -179,10 +186,11 @@ class GraphRAG:
         # Identify relevant nodes in the graph
         relevant_nodes = set()
         
-        # Add issue types from entities
+        # Add issue types from entities (normalized match to handle underscores vs spaces)
         for issue in entities['issue_types']:
+            issue_norm = self._normalize(issue)
             for graph_node in self.graph.nodes():
-                if issue in str(graph_node).lower():
+                if issue_norm in self._normalize(graph_node):
                     relevant_nodes.add(graph_node)
         
         # Add devices from entities
@@ -224,35 +232,40 @@ class GraphRAG:
                                 resolutions.append(resolution)
                                 paths.append((node, cause, resolution))
         
-        # If no paths found, try to find any connected paths
-        if not paths:
-            for node in relevant_nodes:
-                for target in self.graph.nodes():
-                    if self.graph.nodes[target].get('type') == 'resolution':
-                        try:
-                            # Find shortest path
-                            path = nx.shortest_path(self.graph, node, target)
-                            if len(path) > 1:
-                                paths.append(tuple(path))
-                        except nx.NetworkXNoPath:
-                            continue
+        # Do not invent cross-issue paths; if no explicit mappings, keep paths empty
         
         # Limit to top k paths
         paths = paths[:k]
         
-        # Get relevant technical manuals
+        # Get relevant technical manuals: neighbors first, then fall back to vector hits
         relevant_manuals = []
+        manual_titles_added = set()
         for node in relevant_nodes:
             for neighbor in self.graph.neighbors(node):
                 if self.graph.nodes[neighbor].get('type') == 'manual':
                     # Find the manual details
                     for _, row in self.data_processor.technical_manuals.iterrows():
-                        if row['title'] == neighbor:
+                        if row['title'] == neighbor and row['title'] not in manual_titles_added:
                             relevant_manuals.append({
                                 'title': row['title'],
                                 'content': row['content']
                             })
-        
+                            manual_titles_added.add(row['title'])
+
+        # If none found via neighbors, include top technical manuals from vector search
+        if not relevant_manuals:
+            for doc, metadata, _ in similar_docs:
+                if metadata.get('source') == 'technical_manual':
+                    title = metadata.get('title')
+                    # Look up full text from dataframe
+                    match = self.data_processor.technical_manuals[self.data_processor.technical_manuals['title'] == title]
+                    if not match.empty and title not in manual_titles_added:
+                        relevant_manuals.append({
+                            'title': title,
+                            'content': match.iloc[0]['content']
+                        })
+                        manual_titles_added.add(title)
+
         return {
             'query': query,
             'entities': entities,
