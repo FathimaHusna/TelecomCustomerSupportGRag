@@ -109,6 +109,12 @@ Endpoints:
 
 Optional: set `UNSTRUCTURED_DIR` to a folder containing `.pdf`, `.md`, or `.txt` files to enable paragraph-aware chunking during ingestion (uses LangChain if available).
 
+### Streamlit Community Cloud
+
+- Main file path: `src/simple_ollama_app.py`
+- Since Cloud cannot run Ollama, set an environment secret `API_BASE` to your FastAPI backend URL and the app will call `POST {API_BASE}/chat` instead of local Ollama.
+- Alternative (no backend): deploy `src/streamlit_graph_only_app.py` which uses the GraphRAG pipeline only (no LLM required).
+
 ## Screenshot
 
 ![Telecom Support Chatbot Screenshot](docs/chatbot_screenshot.png)
