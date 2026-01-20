@@ -20,3 +20,11 @@ pydeck>=0.8.0
 
 # For local development
 ipykernel>=6.22.0
+
+# API service
+fastapi>=0.110.0
+uvicorn>=0.23.2
+
+# Optional unstructured ingestion
+langchain>=0.1.0
+pypdf>=3.9.0

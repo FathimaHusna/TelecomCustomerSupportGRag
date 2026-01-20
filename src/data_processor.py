@@ -4,6 +4,17 @@ import re
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import faiss
+from typing import List, Optional
+
+# Optional imports for unstructured ingestion
+try:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter  # type: ignore
+except Exception:
+    RecursiveCharacterTextSplitter = None  # type: ignore
+try:
+    from pypdf import PdfReader  # type: ignore
+except Exception:
+    PdfReader = None  # type: ignore
 
 class DataProcessor:
     def __init__(self, data_dir):
@@ -30,6 +41,7 @@ class DataProcessor:
         self.document_texts = []
         self.document_metadata = []
         self.index = None
+        self.unstructured_dir = os.getenv('UNSTRUCTURED_DIR')
         
     def load_data(self):
         """Load all data sources from the data directory"""
@@ -87,6 +99,11 @@ class DataProcessor:
             })
         
         print(f"Preprocessed {len(self.document_texts)} total documents")
+        # Optionally ingest unstructured docs from UNSTRUCTURED_DIR
+        try:
+            self._ingest_unstructured_documents()
+        except Exception as e:
+            print(f"Warning: failed to ingest unstructured documents: {e}")
         return len(self.document_texts)
     
     def create_embeddings(self):
@@ -197,3 +214,88 @@ class DataProcessor:
                 entities['network_types'].append(pattern)
         
         return entities
+
+    # ---- Unstructured ingestion helpers ----
+    def _ingest_unstructured_documents(self):
+        """
+        Ingest unstructured documents (pdf/txt/md) from UNSTRUCTURED_DIR env var.
+        Uses LangChain RecursiveCharacterTextSplitter if available to preserve paragraph semantics.
+        """
+        base = (self.unstructured_dir or '').strip()
+        if not base:
+            return 0
+        if not os.path.isdir(base):
+            print(f"UNSTRUCTURED_DIR path not found: {base}")
+            return 0
+
+        files = []
+        for root, _, fnames in os.walk(base):
+            for f in fnames:
+                lf = f.lower()
+                if lf.endswith(('.pdf', '.txt', '.md')):
+                    files.append(os.path.join(root, f))
+        if not files:
+            return 0
+
+        chunks_total = 0
+        for path in files:
+            try:
+                text = self._read_file_text(path)
+                if not text:
+                    continue
+                chunks = self._chunk_text(text)
+                for chunk in chunks:
+                    self.document_texts.append(f"Doc: {os.path.basename(path)}. Content: {chunk}")
+                    self.document_metadata.append({
+                        'source': 'unstructured_doc',
+                        'path': path,
+                        'file': os.path.basename(path)
+                    })
+                    chunks_total += 1
+            except Exception as e:
+                print(f"Skip file {path}: {e}")
+        if chunks_total:
+            print(f"Ingested {chunks_total} chunks from unstructured docs in {base}")
+        return chunks_total
+
+    def _read_file_text(self, path: str) -> str:
+        """Read text from supported files."""
+        if path.lower().endswith('.pdf'):
+            if PdfReader is None:
+                print("pypdf not available; skipping PDF: " + path)
+                return ""
+            try:
+                reader = PdfReader(path)
+                pages = [p.extract_text() or '' for p in reader.pages]
+                return '\n'.join(pages)
+            except Exception:
+                return ""
+        try:
+            with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                return f.read()
+        except Exception:
+            return ""
+
+    def _chunk_text(self, text: str) -> List[str]:
+        """Chunk text using LangChain if available; else naive paragraph split."""
+        if RecursiveCharacterTextSplitter is not None:
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=800,
+                chunk_overlap=100,
+                separators=["\n\n", "\n", ". ", " "]
+            )
+            return [c.page_content for c in splitter.create_documents([text])]
+        # Fallback: split on double newline, cap length
+        paras = [p.strip() for p in text.split('\n\n') if p.strip()]
+        out = []
+        buf = ''
+        for p in paras:
+            if len(buf) + len(p) < 800:
+                buf = (buf + '\n\n' + p) if buf else p
+            else:
+                if buf:
+                    out.append(buf)
+                buf = p
+        if buf:
+            out.append(buf)
+        return out

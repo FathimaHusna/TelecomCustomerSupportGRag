@@ -94,6 +94,21 @@ streamlit run simple_ollama_app.py
    - Try the sample queries or type your own telecom support questions
    - Toggle debug mode to see additional information
 
+### FastAPI (REST API)
+
+Run the FastAPI service and call it from any client:
+
+```
+# from project root
+uvicorn src.api:app --reload --port 8000
+```
+
+Endpoints:
+- `GET /health` — returns `{ status, initialized }`
+- `POST /chat` — body: `{ "query": "..." }` → `{ response, model }`
+
+Optional: set `UNSTRUCTURED_DIR` to a folder containing `.pdf`, `.md`, or `.txt` files to enable paragraph-aware chunking during ingestion (uses LangChain if available).
+
 ## Screenshot
 
 ![Telecom Support Chatbot Screenshot](docs/chatbot_screenshot.png)
