@@ -14,7 +14,16 @@ class ChatbotEvaluator:
     
     def __init__(self):
         """Initialize the chatbot evaluator"""
-        self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        # Respect EMBEDDING_DEVICE; default to CPU and fall back if GPU is unavailable
+        self.embedding_device = os.getenv('EMBEDDING_DEVICE', 'cpu').lower()
+        try:
+            self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2', device=self.embedding_device)
+        except Exception as e:
+            # Fallback to CPU if initialization on requested device fails
+            print(f"Evaluator: error initializing embedding model on '{self.embedding_device}': {e}")
+            print("Evaluator: falling back to CPU for embeddings.")
+            self.embedding_device = 'cpu'
+            self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
         self.metrics = {
             'response_relevance': [],
             'context_utilization': [],

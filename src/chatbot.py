@@ -40,8 +40,16 @@ class TelecomSupportChatbot:
         Returns:
             bool: True if initialization was successful, False otherwise
         """
+        return self.reload_data()
+
+    def reload_data(self):
+        """
+        Reload data from disk and rebuild the knowledge graph and vector index.
+        Useful for syncing with new data without restarting the service.
+        """
         try:
-            # Initialize data pipeline (independent of Ollama availability)
+            print(f"Reloading data from {self.data_dir}...")
+            # Initialize data pipeline
             data_processor = DataProcessor(self.data_dir)
             if not data_processor.load_data():
                 print("Failed to load data files from data directory")
@@ -59,13 +67,10 @@ class TelecomSupportChatbot:
             if self.enable_visualization:
                 self._visualize_graph()
                 
-            # Check Ollama availability after graph is ready (warn but don't fail init)
-            if not self.local_model.is_ollama_available:
-                print("Warning: Ollama is not available. You can still browse graph features; responses will fail until Ollama runs.")
-
+            print("Chatbot data successfully reloaded.")
             return True
         except Exception as e:
-            print(f"Error initializing chatbot: {e}")
+            print(f"Error during data reload: {e}")
             return False
     
     def _visualize_graph(self):

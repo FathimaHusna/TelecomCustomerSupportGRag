@@ -59,44 +59,54 @@ class DataProcessor:
     
     def preprocess_data(self):
         """Preprocess and combine all data sources for embedding"""
+        # Reset existing data to avoid duplication on reload
+        self.document_texts = []
+        self.document_metadata = []
+        
         # Process support tickets
         for _, row in self.support_tickets.iterrows():
             text = f"Ticket: {row['issue_type']}. Description: {row['description']}. Resolution: {row['resolution']}"
-            self.document_texts.append(text)
-            self.document_metadata.append({
-                'source': 'support_ticket',
-                'id': row['ticket_id'],
-                'issue_type': row['issue_type'],
-                'resolution': row['resolution'],
-                'device_type': row['device_type'],
-                'network_type': row['network_type']
-            })
+            chunks = self._chunk_text(text)
+            for chunk in chunks:
+                self.document_texts.append(chunk)
+                self.document_metadata.append({
+                    'source': 'support_ticket',
+                    'id': row['ticket_id'],
+                    'issue_type': row['issue_type'],
+                    'resolution': row['resolution'],
+                    'device_type': row['device_type'],
+                    'network_type': row['network_type']
+                })
         
         # Process technical manuals
         for _, row in self.technical_manuals.iterrows():
             text = f"Manual: {row['title']}. Category: {row['category']}. Content: {row['content']}"
-            self.document_texts.append(text)
-            self.document_metadata.append({
-                'source': 'technical_manual',
-                'id': row['manual_id'],
-                'title': row['title'],
-                'category': row['category'],
-                'device_type': row['device_type'],
-                'network_type': row['network_type']
-            })
+            chunks = self._chunk_text(text)
+            for chunk in chunks:
+                self.document_texts.append(chunk)
+                self.document_metadata.append({
+                    'source': 'technical_manual',
+                    'id': row['manual_id'],
+                    'title': row['title'],
+                    'category': row['category'],
+                    'device_type': row['device_type'],
+                    'network_type': row['network_type']
+                })
         
         # Process escalation records
         for _, row in self.escalation_records.iterrows():
             text = f"Escalation for ticket {row['ticket_id']}. Root cause: {row['root_cause']}. Resolution steps: {row['resolution_steps']}"
-            self.document_texts.append(text)
-            self.document_metadata.append({
-                'source': 'escalation_record',
-                'id': row['escalation_id'],
-                'ticket_id': row['ticket_id'],
-                'root_cause': row['root_cause'],
-                'resolution_steps': row['resolution_steps'],
-                'escalation_level': row['escalation_level']
-            })
+            chunks = self._chunk_text(text)
+            for chunk in chunks:
+                self.document_texts.append(chunk)
+                self.document_metadata.append({
+                    'source': 'escalation_record',
+                    'id': row['escalation_id'],
+                    'ticket_id': row['ticket_id'],
+                    'root_cause': row['root_cause'],
+                    'resolution_steps': row['resolution_steps'],
+                    'escalation_level': row['escalation_level']
+                })
         
         print(f"Preprocessed {len(self.document_texts)} total documents")
         # Optionally ingest unstructured docs from UNSTRUCTURED_DIR

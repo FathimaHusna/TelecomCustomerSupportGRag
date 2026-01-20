@@ -28,3 +28,4 @@ uvicorn>=0.23.2
 # Optional unstructured ingestion
 langchain>=0.1.0
 pypdf>=3.9.0
+python-multipart

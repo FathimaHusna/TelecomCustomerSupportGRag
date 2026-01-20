@@ -1,0 +1,47 @@
+[
+  {
+    "query": "My calls keep dropping in the afternoon",
+    "response": "Likely Cause: Signal interference from nearby construction site\nSteps:\n- Reseat SIM: power off, remove, clean, reinsert; if still failing, visit a store to replace the SIM\n- Recommended WiFi calling feature activation\nEscalate: Escalate if drops persist across locations or after steps; mention driving route/time.",
+    "response_time": 0.026996374130249023,
+    "relevance_score": 0.3876897096633911,
+    "context_score": 0.2222222222222222,
+    "path_score": 1.0,
+    "overall_score": 0.5366373106285378
+  },
+  {
+    "query": "Why is my internet so slow during peak hours?",
+    "response": "Likely Cause: Bandwidth throttling incorrectly applied to account\nSteps:\n- Test at non\u2011peak hours to rule out congestion\n- Disable background data and auto\u2011updates temporarily\n- Toggle Airplane Mode and retry a speed test\nEscalate: Escalate if unresolved after steps or safety-impacting.",
+    "response_time": 0.0350034236907959,
+    "relevance_score": 0.5278838872909546,
+    "context_score": 0.3333333333333333,
+    "path_score": 1.0,
+    "overall_score": 0.6204057402080959
+  },
+  {
+    "query": "I'm being charged for services I didn't subscribe to",
+    "response": "Likely Cause: Expired/invalid payment method or subscription misconfiguration\nSteps:\n- Refunded incorrect charges and fixed subscription\nEscalate: Escalate if unauthorized charges remain after subscription/payment correction.",
+    "response_time": 0.03471016883850098,
+    "relevance_score": 0.5794247388839722,
+    "context_score": 0.5,
+    "path_score": 0.0,
+    "overall_score": 0.3598082462946574
+  },
+  {
+    "query": "I have no signal in my basement",
+    "response": "Likely Cause: Office located in signal shadow area\nSteps:\n- Provided signal booster device\nEscalate: Escalate if area-wide or persists after steps; note location/time.",
+    "response_time": 0.02341485023498535,
+    "relevance_score": 0.3352251350879669,
+    "context_score": 0.5,
+    "path_score": 1.0,
+    "overall_score": 0.611741711695989
+  },
+  {
+    "query": "My data limit is reached too quickly each month",
+    "response": "Likely Cause: Background apps consuming data unexpectedly\nSteps:\n- Identified unauthorized hotspot usage, set limits\n- Identified background app consuming data, provided guidance\nEscalate: Escalate if unresolved after steps or safety-impacting.",
+    "response_time": 0.02747058868408203,
+    "relevance_score": 0.3232560157775879,
+    "context_score": 0.5,
+    "path_score": 0.0,
+    "overall_score": 0.2744186719258626
+  }
+]
